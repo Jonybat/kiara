@@ -174,7 +174,7 @@ class Handler(socketserver.BaseRequestHandler):
 						anidb.watch(file, self)
 
 					if 'o' in act:
-						anime_name = file.anime_name.replace('/', '_')
+						anime_name = file.anime_name.replace('/', ' ').replace(':', '').replace('?', '')
 						dir = os.path.join(os.path.expanduser((
 							config['basepath_movie']
 							if file.is_movie()
@@ -190,7 +190,7 @@ class Handler(socketserver.BaseRequestHandler):
 								pad(
 									len(str(file.anime_total_eps)),
 									str(file.ep_no)).replace("S", ""),
-								file.ep_name,
+								file.ep_name.replace('/', ' ').replace(':', '').replace('?', ''),
 								file.group_name, os.path.splitext(file_name)[1])
 						else:
 							new_name = "%s - ep%s - %s - [%s]%s" % (
@@ -198,7 +198,7 @@ class Handler(socketserver.BaseRequestHandler):
 								pad(
 									len(str(file.anime_total_eps)),
 									str(file.ep_no)),
-								file.ep_name,
+								file.ep_name.replace('/', ' ').replace(':', '').replace('?', ''),
 								file.group_name, os.path.splitext(file_name)[1])
 						new_path = os.path.join(dir, new_name)
 
