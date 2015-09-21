@@ -1,6 +1,10 @@
 Kiara
 =====
 
+My fork of [kiara](https://github.com/hartfelt/kiara/), optimized for use with Kodi, with AniDB scrapper.
+
+***
+
 Kiara will hash your anime and add the episode to your anidb mylist.
 It will also mark those files watched, and organize them nicely in folders.
 
@@ -21,12 +25,12 @@ From `kiara -h`:
 	usage: kiara [-h] [-w] [-o] [--copy] [--overwrite] [-c CONFIG]
 	             [--find-duplicates] [--forget [FID [FID ...]]]
 	             [FILE [FILE ...]]
-	
+
 	Do stuff with anime files and anidb.
-	
+
 	positional arguments:
 	  FILE                  A file to do something with
-	
+
 	optional arguments:
 	  -h, --help            show this help message and exit
 	  -w, --watch           Mark all the files watched.
