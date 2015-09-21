@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import socketserver
 import socket # for the exceptions
 from libkiara import ed2khash, database, anidb, AbandonShip
+import re
 
 config = {}
 
@@ -56,6 +57,10 @@ class KiaraFile(object):
 			self.anime_type == 'Movie' or
 			self.anime_type == 'OVA' and self.anime_total_eps == 1 or
 			self.anime_type == 'Web' and self.anime_total_eps == 1)
+
+	def is_special(self):
+		return (
+			re.match("^S[0-9]+$", self.ep_no))
 
 	def __str__(self):
 		parts = [self.name]
