@@ -157,7 +157,7 @@ class Handler(socketserver.BaseRequestHandler):
 
 				if file.misses_info() or not file.updated or \
 						'u' in act and \
-						file.updated < datetime.now() - timedelta(days=7):
+						file.updated < datetime.now() - timedelta(hours=1):
 					anidb.load_info(file, self)
 
 				if not file.fid:
