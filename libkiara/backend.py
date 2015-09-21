@@ -184,17 +184,22 @@ class Handler(socketserver.BaseRequestHandler):
 
 						makedirs(os.path.normpath(dir))
 						new_name = None
-						if file.anime_total_eps == "1":
-							new_name = "[%s] %s [%s]%s" % (
-								file.group_name, anime_name, file.crc32,
-								os.path.splitext(file_name)[1])
+						if file.is_special():
+							new_name = "%s - s00e%s - %s - [%s]%s" % (
+								anime_name,
+								pad(
+									len(str(file.anime_total_eps)),
+									str(file.ep_no)).replace("S", ""),
+								file.ep_name,
+								file.group_name, os.path.splitext(file_name)[1])
 						else:
-							new_name = "[%s] %s - %s [%s]%s" % (
-								file.group_name, anime_name,
+							new_name = "%s - ep%s - %s - [%s]%s" % (
+								anime_name,
 								pad(
 									len(str(file.anime_total_eps)),
 									str(file.ep_no)),
-								file.crc32, os.path.splitext(file_name)[1])
+								file.ep_name,
+								file.group_name, os.path.splitext(file_name)[1])
 						new_path = os.path.join(dir, new_name)
 
 						if file_name == new_path:
