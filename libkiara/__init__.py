@@ -13,8 +13,8 @@ class AbandonShip(BaseException):
 _config = {
 	'host': 'api.anidb.net',
 	'port': '9000',
-	'session': '~/.kiara.session',
-	'database': '~/.kiara.db',
+	'session': '~/.kiara/kiara.session',
+	'database': '~/.kiara/kiara.db',
 }
 
 def _config_items(file):
@@ -29,8 +29,7 @@ def load_config_file(file_name):
 		with open(file_name, 'r') as fp:
 			_config.update(_config_items(fp))
 	except: pass
-load_config_file('/etc/kiararc')
-load_config_file(os.path.expanduser('~/.kiararc'))
+load_config_file(os.path.expanduser('~/.kiara/kiararc'))
 
 def check_config():
 	config_ok = True
@@ -111,7 +110,7 @@ def process(file,
 			q += 'c'
 		if organize_overwrite:
 			q += 'x'
-	
+
 	for line in _send(q + ' ' + file):
 		yield line
 

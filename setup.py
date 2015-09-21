@@ -1,4 +1,7 @@
 from distutils.core import setup
+import os, os.path
+
+data_files = [(os.path.expanduser('~/.kiara'), ['kiararc'])]
 
 setup(
 	name='kiara',
@@ -9,5 +12,5 @@ setup(
 	url='https://github.com/hartfelt/kiara',
 	packages=['libkiara'],
 	scripts=['kiara'],
-	data_files=[('/etc', ['kiararc'])],
+	data_files=data_files,
 )
