@@ -79,12 +79,12 @@ def tag_gen(length=5):
 def _comm(command, **kwargs):
 	global next_message, session_key
 	assert sock != None
-	
+
 	wait = (next_message - datetime.now()).total_seconds()
 	if wait > 0:
 		time.sleep(wait)
 	next_message = datetime.now() + message_interval
-	
+
 	# Add a tag
 	tag = tag_gen()
 	kwargs['tag'] = tag
@@ -97,7 +97,7 @@ def _comm(command, **kwargs):
 	output('debug', '_',
 		'--> %s' % (shit if command is not 'AUTH' else 'AUTH (hidden)'))
 	sock.send(shit.encode('ascii'))
-	
+
 	# Receive shit
 	while True:
 		try:
@@ -113,7 +113,7 @@ def _comm(command, **kwargs):
 				# blocking us
 				output('error', 'socket_timeout_again')
 				raise AbandonShip
-		
+
 		output('debug', '_', '<-- %s' % reply)
 		if reply[0:3] == "555" or reply[6:9] == '555':
 			output('error', 'banned', reply)
@@ -125,7 +125,7 @@ def _comm(command, **kwargs):
 			output('debug', 'wrong_tag')
 			# If this was a transmission error, or an anidb error, we will hit
 			# a timeout and die...
-	
+
 	if code in DIE_MESSAGES:
 		output('error', 'oh_no', code, data)
 		raise AbandonShip
@@ -149,12 +149,12 @@ def ping(redirect):
 
 def _connect(force=False, needs_auth=True):
 	global session_key, sock
-	
+
 	if not sock:
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		sock.connect((config['host'], int(config['port'])))
 		sock.settimeout(10)
-	
+
 	# If we have a session key, we assume that we are connected.
 	if (not session_key and needs_auth) or force:
 		output('status', 'logging_in')
@@ -179,7 +179,7 @@ def _connect(force=False, needs_auth=True):
 		else:
 			output('error', 'login_unexpected_return', code, key)
 			raise AbandonShip
-		
+
 		session_key = key.split()[0]
 		output('status', 'login_successful')
 		output('debug', 'login_session_key', session_key)
@@ -197,17 +197,17 @@ def _type_map(ext):
 def load_info(thing, redirect):
 	set_output(redirect.reply)
 	_connect()
-	
+
 	lookup = {
 		'fmask': '48080100a0',
-		'amask': '90808040',
+		'amask': '9080C040',
 	}
 	if thing.fid:
 		lookup['fid'] = thing.fid
 	else:
 		lookup['size'] = thing.size
 		lookup['ed2k'] = thing.hash
-	
+
 	code, reply = _comm('FILE', **lookup)
 	if code == NO_SUCH_FILE:
 		output('error', 'anidb_file_unknown')
@@ -226,6 +226,7 @@ def load_info(thing, redirect):
 		thing.anime_type = parts.pop()
 		thing.anime_name = parts.pop()
 		thing.ep_no = parts.pop()
+		thing.ep_name = parts.pop()
 		thing.group_name = parts.pop()
 		thing.updated = datetime.now()
 		thing.dirty = True
@@ -233,7 +234,7 @@ def load_info(thing, redirect):
 def add(thing, redirect):
 	set_output(redirect.reply)
 	_connect()
-	
+
 	code, reply = _comm('MYLISTADD',
 		fid=str(thing.fid),
 		state='1')
@@ -253,7 +254,7 @@ def add(thing, redirect):
 def watch(thing, redirect):
 	set_output(redirect.reply)
 	_connect()
-	
+
 	code, reply = _comm('MYLISTADD',
 		lid=str(thing.mylist_id),
 		edit='1', state='1', viewed='1')

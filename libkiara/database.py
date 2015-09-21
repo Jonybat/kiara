@@ -8,9 +8,9 @@ def connect(database, user):
 	conn = sqlite3.connect(database)
 	username = user
 	db = database # For reconnecting;
-	
+
 	c = conn.cursor()
-	
+
 	# Create tables if they do not exist.
 	c.execute('''
 		CREATE TABLE IF NOT EXISTS file (
@@ -21,6 +21,7 @@ def connect(database, user):
 			aid integer,
 			crc32 text,
 			ep_no text,
+			ep_name text,
 			group_name text,
 			file_type text,
 			updated text
@@ -58,25 +59,25 @@ def _check_connection():
 def load(thing):
 	_check_connection()
 	c = conn.cursor()
-	
+
 	# Lookup thing by name
 	if not thing.hash:
 		c.execute('''
-			SELECT hash, fid, aid, crc32, ep_no, group_name, file_type, updated
+			SELECT hash, fid, aid, crc32, ep_no, ep_name, group_name, file_type, updated
 			FROM file
 			WHERE filename = ? AND size = ?
 		''', (thing.name, thing.size))
 		r = c.fetchone()
 		if r:
-			thing.hash, thing.fid, thing.aid, thing.crc32, thing.ep_no, \
-				thing.group_name, thing.file_type = r[:7]
-			thing.updated = datetime.strptime(r[7], '%Y-%m-%d %H:%M:%S.%f')
-	
+			thing.hash, thing.fid, thing.aid, thing.crc32, thing.ep_no, thing.ep_name, \
+				thing.group_name, thing.file_type = r[:8]
+			thing.updated = datetime.strptime(r[8], '%Y-%m-%d %H:%M:%S.%f')
+
 	# Lookup thing by hash
 	if thing.hash:
 		c.execute('''
 			SELECT
-				filename, fid, aid, crc32, ep_no, group_name, file_type, updated
+				filename, fid, aid, crc32, ep_no, ep_name, group_name, file_type, updated
 			FROM file
 			WHERE hash = ? AND size = ?
 		''', (thing.hash, thing.size))
@@ -85,13 +86,13 @@ def load(thing):
 			# This is a new thing
 			thing.dirty = True
 			return
-		
+
 		if r[0] != thing.name:
 			thing.dirty = True
-		thing.fid, thing.aid, thing.crc32, thing.ep_no, thing.group_name, \
-			thing.file_type = r[1:7]
-		thing.updated = datetime.strptime(r[7], '%Y-%m-%d %H:%M:%S.%f')
-		
+		thing.fid, thing.aid, thing.crc32, thing.ep_no, thing.ep_name, thing.group_name, \
+			thing.file_type = r[1:8]
+		thing.updated = datetime.strptime(r[8], '%Y-%m-%d %H:%M:%S.%f')
+
 	if thing.fid:
 		# Look up the status.
 		c.execute('''
@@ -107,7 +108,7 @@ def load(thing):
 			thing.updated = min(
 				thing.updated,
 				datetime.strptime(r[2], '%Y-%m-%d %H:%M:%S.%f'))
-	
+
 	if thing.aid:
 		c.execute('''
 			SELECT total_eps, name, type, updated
@@ -132,13 +133,13 @@ def save(thing):
 		c.execute('''
 			INSERT INTO file (
 				hash, filename, size, fid, aid, crc32, ep_no,
-				group_name, file_type, updated)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+				ep_name, group_name, file_type, updated)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		''', (
 			thing.hash, thing.name, thing.size, thing.fid, thing.aid,
-			thing.crc32, thing.ep_no, thing.group_name, thing.file_type,
+			thing.crc32, thing.ep_no, thing.ep_name, thing.group_name, thing.file_type,
 			str(thing.updated)))
-		
+
 		c.execute('''
 			DELETE FROM file_status
 			WHERE fid = ? AND username = ?
@@ -151,7 +152,7 @@ def save(thing):
 			''', (
 				thing.fid, username, thing.watched, thing.mylist_id,
 				str(thing.updated)))
-		
+
 		c.execute('''
 			DELETE FROM anime
 			WHERE aid = ?
@@ -162,7 +163,7 @@ def save(thing):
 		''', (
 			thing.aid, thing.anime_total_eps, thing.anime_name,
 			thing.anime_type, str(thing.updated)))
-		
+
 		conn.commit()
 
 def find_duplicates():
