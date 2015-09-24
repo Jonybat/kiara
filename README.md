@@ -3,6 +3,10 @@ Kiara
 
 My fork of [kiara](https://github.com/hartfelt/kiara/), optimized for use with Kodi, with AniDB scrapper.
 
+Files are renamed to the following format: `anime_name - epXX - episode_name - [group_name].ext`
+
+That is applied to all types of anime (movie, ova, etc), with the exception of special episodes, where the `epXX` is replaced with `s00eXX`. Movies can still be sorted to separate folders, but the format is still necessary for Kodi's scrapper to recognize the files.
+
 ***
 
 Kiara will hash your anime and add the episode to your anidb mylist.
